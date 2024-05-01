@@ -120,18 +120,28 @@ const server = http.createServer((req, res) => {
         const dogId = urlParts[2];
         const dog = dogs.find((dog) => dog.dogId === Number(dogId));
         // Your code here
-        let dogDetailsHtml = fs.readFileSync(
-          './views/dog-details.html',
-          'utf-8'
-        );
-        let resHtml = dogDetailsHtml;
-        resHtml = resHtml.replaceAll('#{name}', dog.name);
-        resHtml = resHtml.replace('#{age}', dog.age);
+        if (dog) {
+          let dogDetailsHtml = fs.readFileSync(
+            './views/dog-details.html',
+            'utf-8'
+          );
+          let resHtml = dogDetailsHtml;
+          resHtml = resHtml.replaceAll('#{name}', dog.name);
+          resHtml = resHtml.replace('#{age}', dog.age);
 
-        res.statusCode = 200;
-        res.setHeader('Content-Type', 'text/html');
-        res.write(resHtml);
-        return res.end();
+          res.statusCode = 200;
+          res.setHeader('Content-Type', 'text/html');
+          res.write(resHtml);
+          return res.end();
+        } else {
+          const htmlPage = fs.readFileSync('./views/error.html', 'utf-8');
+          const resBody = htmlPage.replace(/#{message}/g, `Dog Not Found`);
+
+          res.statusCode = 404;
+          res.setHeader('Content-Type', 'text/html');
+          res.write(resBody);
+          return res.end();
+        }
       }
     }
 
@@ -153,8 +163,6 @@ const server = http.createServer((req, res) => {
         const dogId = urlParts[2];
         const dog = dogs.find((dog) => dog.dogId === Number(dogId));
         // Your code here
-        let notFoundHtml = fs.readFileSync('./views/404.html');
-
         if (dog) {
           let dogEditHtml = fs.readFileSync('./views/edit-dog.html', 'utf-8');
           let resHtml = dogEditHtml;
@@ -166,16 +174,14 @@ const server = http.createServer((req, res) => {
           res.write(resHtml);
           return res.end();
         } else {
+          const htmlPage = fs.readFileSync('./views/error.html', 'utf-8');
+          const resBody = htmlPage.replace(/#{message}/g, `Dog Not Found`);
+
           res.statusCode = 404;
           res.setHeader('Content-Type', 'text/html');
-          res.write(notFoundHtml);
+          res.write(resBody);
           return res.end();
         }
-      } else {
-        res.statusCode = 404;
-        res.setHeader('Content-Type', 'text/html');
-        res.write(notFoundHtml);
-        return res.end();
       }
     }
 
